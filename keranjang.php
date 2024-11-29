@@ -1,51 +1,60 @@
 <?php 
-session_start();
+session_start(); // Memulai sesi untuk mengakses data session, seperti username dan status login.
 
+// Mengecek apakah session 'username' ada, jika tidak, arahkan pengguna ke halaman login
 if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
-    exit();
+    header("Location: login.php"); // Arahkan ke halaman login jika session username tidak ada
+    exit(); // Menghentikan eksekusi lebih lanjut setelah pengalihan
 }
 
-$host = 'localhost';
-$user = 'user';
-$password = '@dunanes_123xxy';
-$dbname = 'perpuspemweb';
+// Mengatur kredensial untuk koneksi ke database
+$host = 'localhost'; // Alamat server database
+$user = 'user'; // Username untuk login ke database
+$password = '@dunanes_123xxy'; // Password untuk login ke database
+$dbname = 'perpuspemweb'; // Nama database yang digunakan
 
+// Membuat koneksi ke database menggunakan MySQLi
 $conn = new mysqli($host, $user, $password, $dbname);
 
+// Mengecek apakah ada kesalahan saat melakukan koneksi ke database
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error); // Menampilkan pesan error jika koneksi gagal
 }
 
+// Mendapatkan username yang sudah login dari session
 $username = $_SESSION['username'];
 
+// Query untuk mencari ID pengguna berdasarkan username
 $sql_user = "SELECT id FROM users WHERE username = ?";
-$stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param("s", $username);
-$stmt_user->execute();
-$user_result = $stmt_user->get_result();
-$user = $user_result->fetch_assoc();
-$user_id = $user['id'];
+$stmt_user = $conn->prepare($sql_user); // Menyiapkan statement query
+$stmt_user->bind_param("s", $username); // Mengikat parameter username ke query
+$stmt_user->execute(); // Menjalankan query
+$user_result = $stmt_user->get_result(); // Mendapatkan hasil query
+$user = $user_result->fetch_assoc(); // Mengambil data hasil query sebagai array
+$user_id = $user['id']; // Menyimpan id pengguna ke dalam variabel $user_id
 
+// Mengecek apakah ada parameter 'hapus' di URL (untuk menghapus item dari keranjang)
 if (isset($_GET['hapus'])) {
-    $keranjang_id = intval($_GET['hapus']);
-    if ($keranjang_id > 0) {
+    $keranjang_id = intval($_GET['hapus']); // Mengambil ID keranjang yang akan dihapus dan mengkonversinya ke integer
+    if ($keranjang_id > 0) { // Mengecek apakah ID valid
+        // Query untuk menghapus data keranjang berdasarkan ID keranjang dan ID pengguna
         $sql = "DELETE FROM keranjang WHERE id = ? AND user_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ii", $keranjang_id, $user_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $conn->prepare($sql); // Menyiapkan statement query
+        $stmt->bind_param("ii", $keranjang_id, $user_id); // Mengikat parameter ID keranjang dan ID pengguna
+        $stmt->execute(); // Menjalankan query untuk menghapus data
+        $stmt->close(); // Menutup statement setelah eksekusi
     }
 }
 
+// Query untuk mengambil data keranjang buku yang dimiliki oleh pengguna berdasarkan user_id
 $sql = "SELECT k.id, b.judul, b.penulis, k.quantity
         FROM keranjang k
         JOIN buku b ON k.book_id = b.id
         WHERE k.user_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt = $conn->prepare($sql); // Menyiapkan statement query
+$stmt->bind_param("i", $user_id); // Mengikat parameter user_id ke query
+$stmt->execute(); // Menjalankan query
+$result = $stmt->get_result(); // Mendapatkan hasil query
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +62,7 @@ $result = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keranjang Buku</title>
+    <title>Keranjang Buku</title> <!-- Judul halaman -->
     <style>
         * {
             margin: 0;
@@ -61,8 +70,9 @@ $result = $stmt->get_result();
             box-sizing: border-box;
         }
 
+        /* Styling untuk halaman dan elemen di dalamnya */
         body {
-            font-family: "Poppins", sans-serif;
+            font-family: "Poppins", sans-serif; 
             background-image: url('images/background.jpg');
             background-size: cover;
             background-position: center;
@@ -74,8 +84,9 @@ $result = $stmt->get_result();
             margin: 0;
         }
 
+        /* Navbar styling */
         .navbar {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.9); 
             padding: 20px 40px;
             border-radius: 0 0 10px 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -101,6 +112,7 @@ $result = $stmt->get_result();
             gap: 20px;
         }
 
+        /* Styling untuk tabel keranjang buku */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -140,6 +152,7 @@ $result = $stmt->get_result();
             background-color: hotpink;
         }
 
+        /* Styling untuk form */
         .form-container {
             background-color: rgba(255, 255, 255, 0.8);
             padding: 2rem;
@@ -154,6 +167,7 @@ $result = $stmt->get_result();
 </head>
 <body>
 
+<!-- Navbar untuk navigasi antar halaman -->
 <div class="navbar">
     <h2>Perpus Pemweb</h2>
     <nav>
@@ -163,12 +177,15 @@ $result = $stmt->get_result();
     </nav>
 </div>
 
+<!-- Form untuk menampilkan keranjang buku pengguna -->
 <div class="form">
     <h3>Keranjang Buku Anda</h3>
 
+    <!-- Mengecek apakah hasil query keranjang kosong atau tidak -->
     <?php if ($result->num_rows == 0): ?>
-        <p>Keranjang Anda kosong.</p>
+        <p>Keranjang Anda kosong.</p> <!-- Menampilkan pesan jika keranjang kosong -->
     <?php else: ?>
+        <!-- Tabel untuk menampilkan daftar buku di keranjang -->
         <table>
             <thead>
                 <tr>
@@ -182,17 +199,18 @@ $result = $stmt->get_result();
             <tbody>
                 <?php 
                 $no = 1;
-                while ($row = $result->fetch_assoc()):
-                ?>
-                <tr>
-                    <td><?php echo $no++; ?></td>
-                    <td><?php echo htmlspecialchars($row['judul']); ?></td>
-                    <td><?php echo htmlspecialchars($row['penulis']); ?></td>
-                    <td><?php echo $row['quantity']; ?></td>
-                    <td>
-                        <a href="keranjang.php?hapus=<?php echo $row['id']; ?>" class="btn">Hapus</a>
-                    </td>
-                </tr>
+                // Menampilkan setiap item di keranjang pengguna
+                while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $no++; ?></td> <!-- Menampilkan nomor urut -->
+                        <td><?php echo htmlspecialchars($row['judul']); ?></td> <!-- Menampilkan judul buku -->
+                        <td><?php echo htmlspecialchars($row['penulis']); ?></td> <!-- Menampilkan penulis buku -->
+                        <td><?php echo $row['quantity']; ?></td> <!-- Menampilkan jumlah buku -->
+                        <td>
+                            <!-- Link untuk menghapus item dari keranjang -->
+                            <a href="keranjang.php?hapus=<?php echo $row['id']; ?>" class="btn">Hapus</a>
+                        </td>
+                    </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
@@ -204,6 +222,6 @@ $result = $stmt->get_result();
 </html>
 
 <?php
-$stmt->close();
-$conn->close();
+$stmt->close(); // Menutup statement query
+$conn->close(); // Menutup koneksi ke database
 ?>
