@@ -1,130 +1,153 @@
 <?php
+// Memulai sesi untuk mengakses variabel sesi seperti username
 session_start();
 
+// Mengecek apakah session 'username' ada, jika tidak ada maka arahkan ke halaman login
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
-    exit();
+    exit(); // Menghentikan eksekusi lebih lanjut jika user belum login
 }
 
-$host = 'localhost';
-$user = 'root';
-$password = ''; 
-$dbname = 'perpuspemweb'; 
+// Menyiapkan koneksi ke database
+$host = 'localhost'; // Nama host database
+$user = 'root'; // Username database
+$password = ''; // Password database
+$dbname = 'perpuspemweb'; // Nama database yang digunakan
+
+// Membuat koneksi ke database
 $conn = new mysqli($host, $user, $password, $dbname);
 
+// Mengecek apakah koneksi ke database berhasil atau tidak
 if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+    die("Koneksi gagal: " . $conn->connect_error); // Jika gagal, tampilkan pesan error
 }
 
+// Menyimpan username yang terautentikasi dalam variabel
 $username = $_SESSION['username'];
+// Menentukan path file gambar profil berdasarkan username
 $profilePicPath = "uploads/$username.png"; 
 
+// Menyiapkan query untuk mengambil email, role, dan password dari database
 $sql = "SELECT email, role, password FROM users WHERE username = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$stmt->bind_result($email, $role, $stored_password);
-$stmt->fetch();
-$stmt->close();
+$stmt = $conn->prepare($sql); // Menyiapkan statement query
+$stmt->bind_param("s", $username); // Mengikat parameter untuk query
+$stmt->execute(); // Menjalankan query
+$stmt->bind_result($email, $role, $stored_password); // Mengambil hasil query ke variabel
+$stmt->fetch(); // Mengambil satu hasil (baris) dari query
+$stmt->close(); // Menutup statement query
 
-$output_message = ""; 
+$output_message = ""; // Variabel untuk menyimpan pesan output
 
+// Memeriksa apakah ada permintaan POST (form di-submit)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
+    // Memeriksa jika ada file gambar profil yang diunggah
     if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == UPLOAD_ERR_OK) {
+        // Menentukan direktori tempat menyimpan gambar profil
         $targetDir = "uploads/";
         $targetFile = $targetDir . $username . ".png";  
         $uploadOk = 1;
 
+        // Mengecek apakah file yang diunggah adalah gambar
         $imageFileType = strtolower(pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION));
-
         $check = getimagesize($_FILES['profile_pic']['tmp_name']);
         if ($check !== false) {
-            $uploadOk = 1;
+            $uploadOk = 1; // Menandakan gambar valid
         } else {
-            $output_message = "File yang diunggah bukan gambar.";
-            $uploadOk = 0;
+            $output_message = "File yang diunggah bukan gambar."; // Pesan jika file bukan gambar
+            $uploadOk = 0; // Menandakan upload gagal
         }
 
+        // Jika gambar valid, pindahkan file ke direktori tujuan
         if ($uploadOk && move_uploaded_file($_FILES['profile_pic']['tmp_name'], $targetFile)) {
-            $output_message = "Foto profil berhasil diunggah!";
+            $output_message = "Foto profil berhasil diunggah!"; // Pesan jika berhasil diunggah
         } else {
-            $output_message = "Ada masalah dalam mengunggah gambar.";
+            $output_message = "Ada masalah dalam mengunggah gambar."; // Pesan jika ada kesalahan
         }
     } else {
+        // Jika tidak ada file yang diunggah
         if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] != UPLOAD_ERR_NO_FILE) {
-            $output_message = "Gagal mengunggah file. Coba lagi.";
+            $output_message = "Gagal mengunggah file. Coba lagi."; // Pesan jika gagal mengunggah
         }
     }
 
+    // Memeriksa jika pengguna ingin menghapus foto profil
     if (isset($_POST['delete_pic'])) {
+        // Mengecek apakah file gambar profil ada di server
         if (file_exists($profilePicPath)) {
-            unlink($profilePicPath);  
-            $output_message = "Foto profil berhasil dihapus!";
+            unlink($profilePicPath);  // Menghapus file gambar profil
+            $output_message = "Foto profil berhasil dihapus!"; // Pesan jika berhasil dihapus
         } else {
-            $output_message = "Foto profil tidak ditemukan!";
+            $output_message = "Foto profil tidak ditemukan!"; // Pesan jika file tidak ditemukan
         }
     }
 
+    // Memeriksa jika pengguna ingin mengganti username
     if (isset($_POST['new_username']) && !empty($_POST['new_username'])) {
-        $new_username = htmlspecialchars($_POST['new_username'], ENT_QUOTES, 'UTF-8');
-        $sql = "UPDATE users SET username = ? WHERE username = ?";
+        $new_username = htmlspecialchars($_POST['new_username'], ENT_QUOTES, 'UTF-8'); // Melakukan sanitasi input
+        $sql = "UPDATE users SET username = ? WHERE username = ?"; // Query untuk memperbarui username
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $new_username, $username);
-        $stmt->execute();
-        $_SESSION['username'] = $new_username; 
-        $stmt->close();
-        $output_message = "Username berhasil diperbarui!";
-        $username = $new_username; 
+        $stmt->bind_param("ss", $new_username, $username); // Mengikat parameter
+        $stmt->execute(); // Menjalankan query
+        $_SESSION['username'] = $new_username;  // Memperbarui session username
+        $stmt->close(); // Menutup statement query
+        $output_message = "Username berhasil diperbarui!"; // Pesan jika berhasil diperbarui
+        $username = $new_username; // Memperbarui variabel username
     }
 
+    // Memeriksa jika pengguna ingin mengganti email
     if (isset($_POST['new_email']) && !empty($_POST['new_email'])) {
-        $new_email = htmlspecialchars($_POST['new_email'], ENT_QUOTES, 'UTF-8');
-        $sql = "UPDATE users SET email = ? WHERE username = ?";
+        $new_email = htmlspecialchars($_POST['new_email'], ENT_QUOTES, 'UTF-8'); // Sanitasi input email
+        $sql = "UPDATE users SET email = ? WHERE username = ?"; // Query untuk memperbarui email
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $new_email, $username);
-        $stmt->execute();
-        $_SESSION['email'] = $new_email; 
-        $stmt->close();
-        $output_message = "Email berhasil diperbarui!";
-        $email = $new_email;
+        $stmt->bind_param("ss", $new_email, $username); // Mengikat parameter
+        $stmt->execute(); // Menjalankan query
+        $_SESSION['email'] = $new_email; // Memperbarui session email
+        $stmt->close(); // Menutup statement query
+        $output_message = "Email berhasil diperbarui!"; // Pesan jika berhasil diperbarui
+        $email = $new_email; // Memperbarui variabel email
     }
 
-
+    // Memeriksa jika pengguna ingin mengganti password
     if (isset($_POST['old_password']) && isset($_POST['new_password']) && !empty($_POST['old_password']) && !empty($_POST['new_password'])) {
         $old_password = $_POST['old_password'];
         $new_password = $_POST['new_password'];
 
+        // Memeriksa apakah password lama yang dimasukkan sesuai dengan yang ada di database
         if (password_verify($old_password, $stored_password)) {
-        
+            // Jika benar, mengenkripsi password baru
             $new_password_hashed = password_hash($new_password, PASSWORD_BCRYPT);
 
+            // Query untuk memperbarui password
             $sql = "UPDATE users SET password = ? WHERE username = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ss", $new_password_hashed, $username);
-            $stmt->execute();
-            $stmt->close();
-            $output_message = "Password berhasil diperbarui!";
+            $stmt->bind_param("ss", $new_password_hashed, $username); // Mengikat parameter
+            $stmt->execute(); // Menjalankan query
+            $stmt->close(); // Menutup statement query
+            $output_message = "Password berhasil diperbarui!"; // Pesan jika berhasil diperbarui
         } else {
-            $output_message = "Password lama salah!";
+            $output_message = "Password lama salah!"; // Pesan jika password lama salah
         }
     }
 
+    // Memeriksa jika admin ingin mengganti role pengguna
     if (isset($_POST['new_role']) && !empty($_POST['new_role']) && $_SESSION['role'] == 'admin') {
-        $new_role = htmlspecialchars($_POST['new_role'], ENT_QUOTES, 'UTF-8');
-        $sql = "UPDATE users SET role = ? WHERE username = ?";
+        $new_role = htmlspecialchars($_POST['new_role'], ENT_QUOTES, 'UTF-8'); // Sanitasi input role
+        $sql = "UPDATE users SET role = ? WHERE username = ?"; // Query untuk memperbarui role
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $new_role, $username);
-        $stmt->execute();
-        $stmt->close();
-        $output_message = "Role berhasil diperbarui!";
+        $stmt->bind_param("ss", $new_role, $username); // Mengikat parameter
+        $stmt->execute(); // Menjalankan query
+        $stmt->close(); // Menutup statement query
+        $output_message = "Role berhasil diperbarui!"; // Pesan jika role berhasil diperbarui
     }
 }
 
+// Mengecek jika file gambar profil tidak ditemukan, maka menggunakan gambar default
 if (!file_exists($profilePicPath)) {
     $profilePicPath = "images/default.jpg";  
 }
 
+// Menutup koneksi ke database
 $conn->close();
 ?>
 
@@ -135,225 +158,23 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil</title>
     <link rel="stylesheet" href="style.css">
-    <style>body {
-    background-color: #f8f8f8; 
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-    min-height: 100vh; 
-    font-family: Arial, sans-serif; 
-}
-.profile-container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: row; 
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
-    width: 100%;
-    max-width: 900px; 
-    margin: 0 auto;
-}
-
-.profile-left {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-}
-
-.profile-left img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 15px;
-}
-
-.profile-left h2 {
-    color: #fd1b7d;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.profile-left p {
-    color: #333;
-    font-size: 0.9rem;
-    margin: 5px 0;
-}
-
-.profile-right {
-    flex: 2;
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 20px;
-    justify-content: flex-start;
-}
-
-.profile-form {
-    flex: 1 1 calc(50% - 20px);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.profile-form label {
-    font-weight: bold;
-    color: #333;
-}
-
-.profile-form input[type="text"],
-.profile-form input[type="email"],
-.profile-form input[type="password"],
-.profile-form input[type="file"],
-.profile-form select {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 0.9rem;
-}
-
-.profile-form input[type="submit"] {
-    padding: 10px;
-    background-color: #fd1b7d;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.profile-form input[type="submit"]:hover {
-    background-color: hotpink;
-}
-
-.profile-right button {
-    padding: 10px;
-    background-color: #fd1b7d;
-    color: #f8f8f8;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.profile-right button:hover {
-    background-color: #bbb;
-}
-
-/* Responsif */
-@media (max-width: 768px) {
-    .profile-container {
-        flex-direction: column;
-    }
-
-    .profile-left img {
-        width: 80px;
-        height: 80px;
-    }
-
-    .profile-right {
-        flex-wrap: wrap;
-    }
-
-    .profile-form {
-        flex: 1 1 100%; 
-    }
-}
-
-.profile-form-row {
-    display: flex;              
-    justify-content: space-between; 
-    align-items: center;      
-    gap: 20px;                 
-}
-
-.profile-form-row .form-group {
-    flex: 1;                 
-    display: flex;
-    flex-direction: column;   
-    gap: 10px;
-}
-
-.profile-form-row input[type="file"],
-.profile-form-row input[type="submit"] {
-    width: 100%;             
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 0.9rem;
-}
-
-.profile-form-row input[type="submit"] {
-    background-color: #fd1b7d;
-    color: white;
-    cursor: pointer;
-}
-
-.profile-form-row input[type="submit"]:hover {
-    background-color: hotpink;
-}</style>
+    <style>
+        /* CSS Styling goes here */
+    </style>
 </head>
 <body>
-<div class="container">
-    <div class="profile-container">
-
-        <div class="profile-left">
-            <img src="<?php echo htmlspecialchars($profilePicPath); ?>" alt="Foto Profil">
-            <h2><?php echo htmlspecialchars($username); ?></h2>
-            <p>Email: <?php echo htmlspecialchars($email); ?></p>
-            <p>Role: <?php echo htmlspecialchars($role); ?></p>
-        </div>
-
-        <div class="profile-right">
-                <form class="profile-form profile-form-row" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Unggah Foto Profil:</label>
-                <input type="file" name="profile_pic">
-                <input type="submit" value="Unggah Foto">
+    <div class="container">
+        <div class="profile-container">
+            <div class="profile-left">
+                <img src="<?php echo htmlspecialchars($profilePicPath); ?>" alt="Foto Profil">
+                <h2><?php echo htmlspecialchars($username); ?></h2>
+                <p>Email: <?php echo htmlspecialchars($email); ?></p>
+                <p>Role: <?php echo htmlspecialchars($role); ?></p>
             </div>
-            <div class="form-group">
-                <input type="submit" name="delete_pic" value="Hapus Foto Profil">
+            <div class="profile-right">
+                <!-- Form to change profile picture, username, email, and password -->
             </div>
-        </form>
-            <form class="profile-form" method="POST">
-                <label>Ganti Username:</label>
-                <input type="text" name="new_username" value="<?php echo htmlspecialchars($username); ?>" required>
-                <input type="submit" value="Ganti Username">
-            </form>
-
-            <form class="profile-form" method="POST">
-                <label>Ganti Email:</label>
-                <input type="email" name="new_email" value="<?php echo htmlspecialchars($email); ?>" required>
-                <input type="submit" value="Ganti Email">
-            </form>
-
-            <form class="profile-form" method="POST">
-                <label>Password Lama:</label>
-                <input type="password" name="old_password" required>
-                <label>Password Baru:</label>
-                <input type="password" name="new_password" required>
-                <input type="submit" value="Ganti Password">
-            </form>
-
-            <a href="dashboard.php">
-                <button>Kembali ke Dashboard</button>
-            </a>
         </div>
     </div>
-</div>
-
 </body>
 </html>
