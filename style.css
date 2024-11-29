@@ -1,233 +1,267 @@
+/* Mengimpor font Poppins dari Google Fonts untuk digunakan pada halaman */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");
+/* Mengimpor Font Awesome untuk ikon-ikon di halaman */
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
 
+/* Mengatur margin, padding, dan box-sizing untuk semua elemen agar konsisten di seluruh halaman */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Mengatur font default untuk body dan input menggunakan font Poppins */
 body,
 input {
   font-family: "Poppins", sans-serif;
 }
 
+/* Mengatur tampilan body, menggunakan flexbox untuk memusatkan elemen di tengah halaman */
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #e95ba7;
+  min-height: 100vh; /* Tinggi halaman minimal 100vh (viewport height) */
+  background-color: #e95ba7; /* Warna latar belakang pink muda */
 }
 
+/* Styling untuk container form login/register */
 .form-container {
-  background-color: #ffffff;
-  padding: 3rem;
-  border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  width: 400px;
+  background-color: #ffffff; /* Warna latar belakang putih untuk form */
+  padding: 3rem; /* Padding di dalam form */
+  border-radius: 10px; /* Sudut form membulat */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Memberikan efek bayangan pada form */
+  width: 400px; /* Lebar form tetap 400px */
 }
 
+/* Mengatur form untuk menggunakan layout flex, dengan elemen vertikal (column) */
 .form {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* Styling untuk judul form */
 .title {
-  font-size: 2rem;
-  color: #fd1b7d;
-  margin-bottom: 1.5rem;
+  font-size: 2rem; /* Ukuran font 2rem */
+  color: #fd1b7d; /* Warna font pink */
+  margin-bottom: 1.5rem; /* Jarak bawah judul */
 }
 
+/* Styling untuk field input, seperti teks atau email */
 .input-field {
-  width: 100%;
-  background-color: #e9e1e1d8;
-  margin: 10px 0;
-  height: 55px;
-  border-radius: 55px;
+  width: 100%; /* Input field memiliki lebar 100% dari container */
+  background-color: #e9e1e1d8; /* Latar belakang input dengan warna abu-abu muda */
+  margin: 10px 0; /* Margin atas dan bawah 10px */
+  height: 55px; /* Tinggi input field */
+  border-radius: 55px; /* Membuat sudut input bulat */
   display: flex;
-  align-items: center;
-  padding: 0 1rem;
+  align-items: center; /* Menyusun isi input di tengah */
+  padding: 0 1rem; /* Padding kiri dan kanan 1rem */
 }
 
+/* Styling untuk ikon dalam input field */
 .input-field i {
-  color: #918c8c;
-  font-size: 1.2rem;
+  color: #918c8c; /* Warna ikon abu-abu */
+  font-size: 1.2rem; /* Ukuran font ikon */
 }
 
+/* Styling untuk elemen input di dalam input field */
 .input-field input {
-  background: none;
-  outline: none;
-  border: none;
-  font-size: 1rem;
-  color: #615e5e;
-  flex: 1;
-  margin-left: 0.5rem;
+  background: none; /* Menghapus latar belakang input */
+  outline: none; /* Menghapus outline saat input difokuskan */
+  border: none; /* Menghapus border pada input */
+  font-size: 1rem; /* Ukuran font 1rem */
+  color: #615e5e; /* Warna font abu-abu */
+  flex: 1; /* Memungkinkan input mengisi ruang kosong */
+  margin-left: 0.5rem; /* Jarak kiri 0.5rem */
 }
 
+/* Styling untuk placeholder dalam input field */
 .input-field input::placeholder {
-  color: #999999;
+  color: #999999; /* Warna placeholder abu-abu */
 }
 
+/* Styling untuk tombol dengan class .btn */
 .btn {
-  width: 100%;
-  background-color: #fd1b7d;
-  border: none;
-  outline: none;
-  height: 49px;
-  border-radius: 49px;
-  color: #ffffff;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin: 20px 0;
-  cursor: pointer;
-  transition: 0.5s;
+  width: 100%; /* Lebar tombol 100% dari container */
+  background-color: #fd1b7d; /* Warna latar belakang tombol pink */
+  border: none; /* Menghapus border tombol */
+  outline: none; /* Menghapus outline tombol */
+  height: 49px; /* Tinggi tombol */
+  border-radius: 49px; /* Membuat tombol bulat */
+  color: #ffffff; /* Warna teks tombol putih */
+  text-transform: uppercase; /* Mengubah teks tombol menjadi huruf kapital */
+  font-weight: 600; /* Menebalkan teks tombol */
+  margin: 20px 0; /* Margin atas dan bawah 20px */
+  cursor: pointer; /* Menampilkan kursor pointer saat tombol diklik */
+  transition: 0.5s; /* Efek transisi halus saat hover */
 }
 
+/* Memberikan margin kanan pada ikon di tombol */
 .btn i {
   margin-right: 8px; 
 }
 
+/* Mengubah warna tombol saat hover */
 .btn:hover {
-  background-color: hotpink;
+  background-color: hotpink; /* Warna latar belakang menjadi hotpink saat hover */
 }
 
+/* Styling untuk teks di bagian toggle-form */
 .toggle-form {
-  font-size: 0.9rem;
-  color: #444343;
+  font-size: 0.9rem; /* Ukuran font sedikit lebih kecil */
+  color: #444343; /* Warna teks abu-abu gelap */
 }
 
+/* Styling untuk link di toggle-form */
 .toggle-form a {
-  color: hotpink;
-  text-decoration: none;
+  color: hotpink; /* Warna link hotpink */
+  text-decoration: none; /* Menghapus underline pada link */
 }
 
+/* Efek hover pada link */
 .toggle-form a:hover {
-  text-decoration: underline;
+  text-decoration: underline; /* Menambahkan underline saat hover */
 }
 
+/* Styling body dengan background gambar */
 body {
-  background-image: url('images/background.jpg'); 
-  background-size: cover; 
-  background-position: center; 
-  background-repeat: no-repeat; 
-  height: 100vh; 
+  background-image: url('images/background.jpg'); /* Gambar background */
+  background-size: cover; /* Gambar menutupi seluruh area */
+  background-position: center; /* Menempatkan gambar di tengah */
+  background-repeat: no-repeat; /* Tidak mengulang gambar */
+  height: 100vh; /* Tinggi body 100vh */
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0;
+  margin: 0; /* Menghapus margin */
 }
 
+/* Styling untuk form-container dengan latar belakang transparan */
 .form-container {
-  background-color: rgba(255, 255, 255, 0.8); 
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
+  background-color: rgba(255, 255, 255, 0.8); /* Latar belakang putih transparan */
+  padding: 2rem; /* Padding di dalam form */
+  border-radius: 10px; /* Sudut form bulat */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Efek bayangan */
+  width: 100%; /* Lebar form 100% */
+  max-width: 400px; /* Lebar maksimal 400px */
+  text-align: center; /* Menyusun teks di tengah */
 }
 
+/* Styling navbar dengan transparansi */
 .navbar {
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 1rem;
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.9); /* Latar belakang navbar transparan */
+    padding: 1rem; /* Padding navbar */
+    border-radius: 0 0 10px 10px; /* Sudut bawah navbar bulat */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Efek bayangan pada navbar */
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
+    justify-content: space-between; /* Menyusun item navbar di kiri dan kanan */
+    align-items: center; /* Menyusun item di tengah secara vertikal */
+    position: fixed; /* Navbar tetap di posisi atas */
+    top: 0; /* Posisi di atas halaman */
+    left: 0; /* Posisi kiri halaman */
+    right: 0; /* Posisi kanan halaman */
+    z-index: 1000; /* Menempatkan navbar di atas elemen lainnya */
 }
 
+/* Styling judul navbar */
 .navbar h2 {
-    color: #fd1b7d;
-    margin: 0;
-    font-size: 1.5rem;
-    padding-left: 20px; 
+    color: #fd1b7d; /* Warna teks navbar pink */
+    margin: 0; /* Menghapus margin */
+    font-size: 1.5rem; /* Ukuran font 1.5rem */
+    padding-left: 20px; /* Padding kiri 20px */
 }
 
+/* Styling untuk tombol logout */
 .logout-btn {
-    background-color: #fd1b7d;
-    color: #ffffff;
-    text-transform: uppercase;
-    font-weight: 600;
-    padding: 0.5rem;
-    border-radius: 5px;
-    text-decoration: none;
-    transition: background-color 0.5s;
-    margin-right: 20px; 
+    background-color: #fd1b7d; /* Warna latar belakang tombol logout pink */
+    color: #ffffff; /* Warna teks putih */
+    text-transform: uppercase; /* Menjadi kapital */
+    font-weight: 600; /* Tebal font */
+    padding: 0.5rem; /* Padding tombol */
+    border-radius: 5px; /* Sudut tombol membulat */
+    text-decoration: none; /* Menghapus underline */
+    transition: background-color 0.5s; /* Transisi warna latar belakang */
+    margin-right: 20px; /* Margin kanan 20px */
 }
 
+/* Efek hover pada tombol logout */
 .logout-btn:hover {
-    background-color: hotpink;
+    background-color: hotpink; /* Warna latar belakang berubah saat hover */
 }
 
+/* Memberikan padding-top pada body agar navbar tidak tertutup */
 body {
     padding-top: 70px; 
 }
 
+/* Styling untuk tabel dengan border-collapse agar tidak ada jarak antar border */
 table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+  width: 100%; /* Lebar tabel 100% */
+  border-collapse: collapse; /* Menggabungkan border tabel */
+  margin-top: 20px; /* Margin atas tabel */
 }
 
+/* Styling untuk elemen tabel dan cell tabel */
 table, th, td {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e0e0e0; /* Border tabel berwarna abu-abu terang */
 }
 
+/* Styling untuk cell tabel */
 th, td {
-  padding: 12px;
-  text-align: left;
+  padding: 12px; /* Padding pada cell */
+  text-align: left; /* Teks rata kiri */
 }
 
+/* Styling khusus untuk header tabel */
 th {
-  background-color: #fd1b7d;
-  color: white;
+  background-color: #fd1b7d; /* Latar belakang header pink */
+  color: white; /* Warna teks putih */
 }
 
+/* Styling untuk baris genap pada tabel agar lebih mudah dibaca */
 tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: #f9f9f9; /* Latar belakang baris genap abu-abu terang */
 }
 
+/* Styling untuk list yang tidak menggunakan bullet */
 ul {
-  list-style-type: none;
-  padding-left: 0;
+  list-style-type: none; /* Menghapus bullet list */
+  padding-left: 0; /* Menghapus padding kiri */
 }
 
+/* Styling untuk item dalam list */
 ul li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #e0e0e0;
+  display: flex; /* Menyusun item secara horizontal */
+  justify-content: space-between; /* Memberi jarak antar item */
+  align-items: center; /* Menyusun item di tengah secara vertikal */
+  padding: 10px 0; /* Padding atas dan bawah */
+  border-bottom: 1px solid #e0e0e0; /* Border bawah tiap item */
 }
 
+/* Menghapus border bawah pada item terakhir di list */
 ul li:last-child {
   border-bottom: none;
 }
 
+/* Styling untuk link yang berfungsi sebagai tombol dalam list */
 ul li a.btn {
   display: flex;
-  align-items: center;
+  align-items: center; /* Menyusun ikon dan teks di tengah */
 }
 
+/* Styling untuk ikon dalam tombol di list */
 ul li a.btn i {
-  margin-right: 5px;
+  margin-right: 5px; /* Jarak kanan ikon */
 }
 
+/* Container umum dengan transisi */
 .container {
-  /* Default styling untuk container */
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out; /* Efek transisi halus */
 }
 
+/* Container khusus dengan mode register (misalnya untuk animasi) */
 .container.register-mode {
-  /* Styling ketika register-mode aktif, misalnya dengan perbedaan layout */
-  transform: translateX(100%);
+  transform: translateX(100%); /* Menggeser container ke kanan saat register-mode aktif */
 }
-
